@@ -1,10 +1,9 @@
 package com.example.upieczona.bar.top
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,13 +17,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavHostController
 import com.example.upieczona.R
+import com.example.upieczona.navigation.Screen
 import com.example.upieczona.ui.theme.colorPinkMain
 import com.example.upieczona.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBarUpieczona(mainViewModel: MainViewModel) {
+fun TopAppBarUpieczona(mainViewModel: MainViewModel, navController: NavHostController) {
   val visibleTitleTopBar by mainViewModel.visibleTitleTopBar.collectAsState()
 
   TopAppBar(
@@ -33,7 +34,7 @@ fun TopAppBarUpieczona(mainViewModel: MainViewModel) {
         visible = visibleTitleTopBar,
         enter = expandVertically(
           expandFrom = Alignment.Bottom,
-          animationSpec = tween(durationMillis =2000)
+          animationSpec = tween(durationMillis = 2000)
         )
       ) {
         Text(
@@ -42,6 +43,10 @@ fun TopAppBarUpieczona(mainViewModel: MainViewModel) {
           modifier = Modifier
             .fillMaxSize()
             .wrapContentSize(Alignment.Center)
+            .clickable {
+              navController.navigate(Screen.Splash.route)
+              mainViewModel.onVisibleTitleTopAppBarChanged(false)
+            }
         )
       }
     }, colors = TopAppBarDefaults.smallTopAppBarColors(

@@ -18,7 +18,11 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,6 +48,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.example.upieczona.dtoposts.PostsOfUpieczonaItemDto
 import com.example.upieczona.static_object.MaterialsUtils.decodeHtml
+import com.example.upieczona.ui.theme.colorPink
 
 @Composable
 fun LazyGridOfPosts(
@@ -52,8 +57,7 @@ fun LazyGridOfPosts(
   navController: NavHostController,
   paddingValues: PaddingValues,
 ) {
-  LazyVerticalGrid(
-    modifier = Modifier.padding(paddingValues),
+  LazyVerticalGrid(modifier = Modifier.padding(paddingValues),
     columns = GridCells.Fixed(2),
     state = scrollState,
     content = {
@@ -64,71 +68,73 @@ fun LazyGridOfPosts(
         val twitterImageUrl = allPosts.value[index].yoastHeadJson.twitterImage
         val selectedImageUrl = imageUrl ?: twitterImageUrl
 
-        Box(
-          modifier = Modifier
-            .padding(8.dp)
-            .aspectRatio(0.4f)
-            .clickable {
-              navController.navigate("Content/${allPosts.value[index].id}")
-            }
-            .background(Color.White),
-          contentAlignment = Alignment.Center
-        ) {
+        Box(modifier = Modifier
+          .background(colorPink)
+          .padding(8.dp)
+          .aspectRatio(0.6f)
+          .shadow(elevation = 9.dp, shape = RoundedCornerShape(15.dp))
+          .clickable {
+            navController.navigate("Content/${allPosts.value[index].id}")
+          }
+          .background(Color.White), contentAlignment = Alignment.Center) {
           Column(
-            modifier = Modifier
-              .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
           ) {
 
-            //Image section
-            Box(
-              modifier = Modifier
-                .height(250.dp)
-                .fillMaxWidth()
-                .padding()
-                .background(Color.White), contentAlignment = Alignment.Center
-            ) {
-              val painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current)
-                  .data(data = selectedImageUrl)
-                  .apply {
-                    crossfade(true)
-                    memoryCachePolicy(CachePolicy.ENABLED)
-                    diskCachePolicy(CachePolicy.ENABLED)
-                  }
-                  .build()
-              )
-              Image(
-                painter = painter,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-              )
-            }
+              //Image section
+              Box(
+                modifier = Modifier
+                  .height(200.dp)
+                  .fillMaxWidth()
+                  .padding()
+                  .background(Color.White),
+                contentAlignment = Alignment.Center
+              ) {
+                val painter = rememberAsyncImagePainter(
+                  ImageRequest.Builder(LocalContext.current).data(data = selectedImageUrl).apply {
+                      crossfade(true)
+                      memoryCachePolicy(CachePolicy.ENABLED)
+                      diskCachePolicy(CachePolicy.ENABLED)
+                    }.build()
+                )
+                Image(
+                  painter = painter,
+                  contentDescription = null,
+                  contentScale = ContentScale.Crop,
+                  modifier = Modifier.fillMaxSize()
+                )
+              }
 
 
-            //Text section
-            Box(
-              modifier = Modifier
-                .weight(0.5f)
-                .fillMaxWidth()
-                .padding()
-                .clip(RoundedCornerShape(5.dp))
-                .background(Color.White), contentAlignment = Alignment.Center
-            ) {
+              //Text section
+
+              val maxTextLength = 30
               Text(
+                modifier = Modifier
+                  .padding(start = 6.dp, end = 6.dp, top = 6.dp)
+                  .clip(RoundedCornerShape(5.dp))
+                  .background(Color.White),
                 fontFamily = MaterialTheme.typography.titleMedium.fontFamily,
                 textAlign = TextAlign.Center,
                 color = Color(0xFF000000),
-                text = decodedTextPostName,
-                fontSize = 13.sp
+                text = if (decodedTextPostName.length > maxTextLength) {
+                  decodedTextPostName.take(maxTextLength) + "..."
+                } else {
+                  decodedTextPostName
+                },
+                fontSize = 13.sp,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
               )
+
             }
           }
-        }
+
+
+
       }
-    }
-  )
+    })
 }
 

@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
 
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
           Scaffold(
-            topBar = { TopAppBarUpieczona(mainViewModel) }, modifier = Modifier.fillMaxSize()
+            topBar = { TopAppBarUpieczona(mainViewModel,navController) }, modifier = Modifier.fillMaxSize()
           ) { paddingValues ->
             NavHost(
               navController = navController,
