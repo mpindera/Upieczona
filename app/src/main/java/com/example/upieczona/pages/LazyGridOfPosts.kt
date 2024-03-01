@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -50,94 +52,83 @@ fun LazyGridOfPosts(
   navController: NavHostController,
   paddingValues: PaddingValues,
 ) {
-  val loc = LocalContext.current
+  LazyVerticalGrid(
+    modifier = Modifier.padding(paddingValues),
+    columns = GridCells.Fixed(2),
+    state = scrollState,
+    content = {
+      items(allPosts.value.size) { index ->
+        val decodedTextPostName = allPosts.value[index].title.rendered.decodeHtml()
 
+        val imageUrl = allPosts.value[index].yoastHeadJson.ogImage?.getOrNull(0)?.url
+        val twitterImageUrl = allPosts.value[index].yoastHeadJson.twitterImage
+        val selectedImageUrl = imageUrl ?: twitterImageUrl
 
-  var loadedPostCount by remember { mutableStateOf(10) }
-  val scrollStates = rememberLazyGridState()
-
-  LazyVerticalGrid(modifier = Modifier.padding(paddingValues),columns = GridCells.Fixed(2), state = scrollState, content = {
-    items(loadedPostCount) { index ->
-      val decodedTextPostName = allPosts.value[index].title.rendered.decodeHtml()
-
-
-      val imageUrl = allPosts.value[index].yoastHeadJson.ogImage?.getOrNull(0)?.url
-      val twitterImageUrl = allPosts.value[index].yoastHeadJson.twitterImage
-      val selectedImageUrl = imageUrl ?: twitterImageUrl
-
-      Box(modifier = Modifier
-        .aspectRatio(0.7f)
-        .padding(6.dp)
-        .shadow(elevation = 7.dp, shape = RoundedCornerShape(8.dp))
-        .clip(RoundedCornerShape(8.dp))
-        .clickable {
-          navController.navigate("Content/${allPosts.value[index].id}")
-        }
-        .background(Color.White), contentAlignment = Alignment.Center) {
-
-        Column(
-          modifier = Modifier.fillMaxSize(),
-          horizontalAlignment = Alignment.CenterHorizontally,
-          verticalArrangement = Arrangement.Center
+        Box(
+          modifier = Modifier
+            .padding(8.dp)
+            .aspectRatio(0.4f)
+            .clickable {
+              navController.navigate("Content/${allPosts.value[index].id}")
+            }
+            .background(Color.White),
+          contentAlignment = Alignment.Center
         ) {
-          Box(
+          Column(
             modifier = Modifier
-              .height(200.dp)
-              .fillMaxSize()
-              .background(Color.White),
-            contentAlignment = Alignment.TopEnd
+              .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
           ) {
 
-            //favorite section
-            val painter = rememberAsyncImagePainter(
-              ImageRequest.Builder(LocalContext.current)
-              .data(data = selectedImageUrl).apply {
-                crossfade(true)
-                memoryCachePolicy(CachePolicy.ENABLED)
-                diskCachePolicy(CachePolicy.ENABLED)
-              }.build())
+            //Image section
+            Box(
+              modifier = Modifier
+                .height(250.dp)
+                .fillMaxWidth()
+                .padding()
+                .background(Color.White), contentAlignment = Alignment.Center
+            ) {
+              val painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                  .data(data = selectedImageUrl)
+                  .apply {
+                    crossfade(true)
+                    memoryCachePolicy(CachePolicy.ENABLED)
+                    diskCachePolicy(CachePolicy.ENABLED)
+                  }
+                  .build()
+              )
+              Image(
+                painter = painter,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+              )
+            }
 
-            Image(
-              painter = painter,
-              contentDescription = null,
-              contentScale = ContentScale.Crop,
-              modifier = Modifier.fillMaxSize(),
-              alignment = Alignment.TopCenter
-            )
 
-
-
+            //Text section
+            Box(
+              modifier = Modifier
+                .weight(0.5f)
+                .fillMaxWidth()
+                .padding()
+                .clip(RoundedCornerShape(5.dp))
+                .background(Color.White), contentAlignment = Alignment.Center
+            ) {
+              Text(
+                fontFamily = MaterialTheme.typography.titleMedium.fontFamily,
+                textAlign = TextAlign.Center,
+                color = Color(0xFF000000),
+                text = decodedTextPostName,
+                fontSize = 13.sp
+              )
+            }
           }
-
-          val maxTextLength = 30
-          Text(
-            modifier = Modifier
-              .padding(start = 6.dp, end = 6.dp, top = 6.dp)
-              .clip(RoundedCornerShape(5.dp))
-              .background(Color.White),
-            fontFamily = MaterialTheme.typography.titleMedium.fontFamily,
-            textAlign = TextAlign.Center,
-            color = Color(0xFF000000),
-            text = if (decodedTextPostName.length > maxTextLength) {
-              decodedTextPostName.take(maxTextLength) + "..."
-            } else {
-              decodedTextPostName
-            },
-            fontSize = 13.sp,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
-          )
         }
       }
     }
-  })
-  LaunchedEffect(loadedPostCount) {
-    scrollState.scrollToItem(loadedPostCount - 1)
-  }
-
-  LaunchedEffect(scrollState) {
-    val maxPostCount = allPosts.value.size
-    scrollState.firstVisibleItemIndex
-  }
+  )
 }
 

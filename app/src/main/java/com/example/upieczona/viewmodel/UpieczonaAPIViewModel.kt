@@ -1,6 +1,8 @@
 package com.example.upieczona.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.upieczona.data.domain.repository.Repository
@@ -22,17 +24,16 @@ class UpieczonaAPIViewModel @Inject constructor(
   private val _select = MutableStateFlow(0)
   val select: StateFlow<Int> = _select
 
-  private val _categoriesState = MutableStateFlow<List<CategoriesOfUpieczonaItemDto>>(emptyList())
-  val categoriesState: StateFlow<List<CategoriesOfUpieczonaItemDto>> = _categoriesState
+  val categoriesState = MutableStateFlow(emptyList<CategoriesOfUpieczonaItemDto>())
 
-  private val _stateNames = MutableStateFlow<List<PostsOfUpieczonaItemDto>>(emptyList())
-  val stateNames: StateFlow<List<PostsOfUpieczonaItemDto>> = _stateNames
+  val stateNames = MutableStateFlow(emptyList<PostsOfUpieczonaItemDto>())
 
-  private val _allPosts = MutableStateFlow<List<PostsOfUpieczonaItemDto>>(emptyList())
-  val allPosts: StateFlow<List<PostsOfUpieczonaItemDto>> = _allPosts
+  private val _allPosts = mutableStateOf<List<PostsOfUpieczonaItemDto>>(emptyList())
+  val allPosts: State<List<PostsOfUpieczonaItemDto>> = _allPosts
 
-  private val _allCategoryPosts = MutableStateFlow<List<PostsOfUpieczonaItemDto>>(emptyList())
-  val allCategoryPosts: StateFlow<List<PostsOfUpieczonaItemDto>> = _allCategoryPosts
+  private val _allCategoryPosts = mutableStateOf<List<PostsOfUpieczonaItemDto>>(emptyList())
+  val allCategoryPosts: State<List<PostsOfUpieczonaItemDto>> = _allCategoryPosts
+
 
   private val _error = MutableStateFlow<String?>(null)
   val error: StateFlow<String?> = _error
@@ -50,11 +51,8 @@ class UpieczonaAPIViewModel @Inject constructor(
       try {
         _isLoading.value = true
 
-        val categories = repository.fetchAllCategories()
-        _categoriesState.value = categories
-
-        val posts = repository.fetchAllPostsFromFirstPage()
-        _allPosts.value = posts
+        stateNames.value = repository.fetchAllPostsFromFirstPage()
+        categoriesState.value = repository.fetchAllCategories()
 
       } catch (e: Exception) {
         Log.e("UpieczonaViewModel", "Error fetching data: ${e.message}")
