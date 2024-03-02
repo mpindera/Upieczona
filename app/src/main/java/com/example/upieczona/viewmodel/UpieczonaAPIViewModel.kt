@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.upieczona.data.domain.repository.Repository
 import com.example.upieczona.dtocategories.CategoriesOfUpieczonaItemDto
 import com.example.upieczona.dtoposts.PostsOfUpieczonaItemDto
+import com.example.upieczona.static_object.MaterialsUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -18,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UpieczonaAPIViewModel @Inject constructor(
-  val repository: Repository
+  private val repository: Repository
 ) : ViewModel() {
 
   private val _select = MutableStateFlow(0)
@@ -46,7 +47,7 @@ class UpieczonaAPIViewModel @Inject constructor(
     fetchCategoriesAndFirstPage()
   }
 
-  fun fetchCategoriesAndFirstPage() {
+  private fun fetchCategoriesAndFirstPage() {
     viewModelScope.launch(Dispatchers.IO) {
       try {
         _isLoading.value = true
@@ -99,5 +100,11 @@ class UpieczonaAPIViewModel @Inject constructor(
       Log.e("UpieczonaViewModel", error.value.toString())
     }
   }
+
+  fun extractPhotosUrls(content: String): List<String> {
+    return MaterialsUtils.regexPatternPhotosUpieczona.findAll(content).map { it.value }.toList()
+      .distinct()
+  }
+
 
 }

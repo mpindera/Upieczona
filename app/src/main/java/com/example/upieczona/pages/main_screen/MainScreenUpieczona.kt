@@ -28,12 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.upieczona.R
 import com.example.upieczona.dtoposts.PostsOfUpieczonaItemDto
 import com.example.upieczona.navigation.NavigationScreen
-import com.example.upieczona.pages.LazyGridOfPosts
 import com.example.upieczona.viewmodel.MainViewModel
 import com.example.upieczona.viewmodel.UpieczonaAPIViewModel
 import kotlinx.coroutines.delay
@@ -45,20 +45,16 @@ fun MainScreenUpieczona(
   navController: NavHostController,
   paddingValues: PaddingValues
 ) {
-
   mainViewModel.onNavigationScreenChanged(NavigationScreen.MAIN_SCREEN)
 
   val categoriesState by upieczonaAPIViewModel.categoriesState.collectAsState()
   val isLoading by upieczonaAPIViewModel.isLoading.collectAsState()
   val allPostsFromCategories = upieczonaAPIViewModel.allCategoryPosts
-
-  val allPosts = upieczonaAPIViewModel.allPosts
+  val post: State<List<PostsOfUpieczonaItemDto>>
 
   var selectedIndex by remember { mutableStateOf(0) }
   var chosenCategory by remember { mutableStateOf("") }
   var showIndicator by remember { mutableStateOf(true) }
-  val post: State<List<PostsOfUpieczonaItemDto>>
-
   val scrollState by remember { mutableStateOf(LazyGridState(0)) }
   var selectValue by remember { mutableStateOf(0) }
 
@@ -90,7 +86,7 @@ fun MainScreenUpieczona(
     RotatingImage()
   } else {
     if (categoriesState.isEmpty()) {
-      Text(text = "stringResource(id = R.string.No_data)")
+      Text(text = stringResource(id = R.string.No_data))
     } else {
       ScrollableTabRow(
         selectedTabIndex = selectedIndex,
@@ -122,7 +118,7 @@ fun MainScreenUpieczona(
           })
         }
       }
-      LazyGridOfPosts(
+      GridPostsUpieczona(
         allPosts = post,
         scrollState = scrollState,
         navController = navController,

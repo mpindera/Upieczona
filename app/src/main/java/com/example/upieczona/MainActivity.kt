@@ -15,11 +15,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.upieczona.bar.top.TopAppBarUpieczona
 import com.example.upieczona.navigation.Screen
+import com.example.upieczona.pages.content_screen.ContentScreenUpieczona
 import com.example.upieczona.pages.main_screen.MainScreenUpieczona
 import com.example.upieczona.pages.splash_screen.SplashScreen
 import com.example.upieczona.ui.theme.UpieczonaTheme
@@ -43,20 +46,41 @@ class MainActivity : ComponentActivity() {
 
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
           Scaffold(
-            topBar = { TopAppBarUpieczona(mainViewModel,navController) }, modifier = Modifier.fillMaxSize()
+            topBar = {
+              TopAppBarUpieczona(
+                mainViewModel = mainViewModel, navController = navController
+              )
+            }, modifier = Modifier.fillMaxSize()
           ) { paddingValues ->
             NavHost(
               navController = navController,
-              startDestination = Screen.Splash.route,
+              startDestination = Screen.SplashScreenOfUpieczona.route,
               modifier = Modifier.padding(paddingValues = paddingValues)
             ) {
-              composable(Screen.Splash.route) {
-                SplashScreen(mainViewModel, navController)
+              composable(Screen.SplashScreenOfUpieczona.route) {
+                SplashScreen(mainViewModel = mainViewModel, navController = navController)
               }
 
-              composable(Screen.MainScreen.route) {
-
-                MainScreenUpieczona(mainViewModel, upieczonaAPIViewModel,navController,paddingValues)
+              composable(Screen.MainScreenOfUpieczona.route) {
+                MainScreenUpieczona(
+                  mainViewModel = mainViewModel,
+                  upieczonaAPIViewModel = upieczonaAPIViewModel,
+                  navController = navController,
+                  paddingValues = paddingValues
+                )
+              }
+              composable(
+                Screen.ContentScreenOfUpieczona.route, arguments = listOf(navArgument("postIndex") {
+                  type = NavType.IntType
+                })
+              ) { backStackEntry ->
+                val postIndex = backStackEntry.arguments?.getInt("postIndex")
+                ContentScreenUpieczona(
+                  postIndex = postIndex,
+                  navController = navController,
+                  upieczonaAPIViewModel = upieczonaAPIViewModel,
+                  paddingValues = paddingValues
+                )
               }
             }
           }

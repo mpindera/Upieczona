@@ -44,7 +44,7 @@ fun TopAppBarUpieczona(mainViewModel: MainViewModel, navController: NavHostContr
             .fillMaxSize()
             .wrapContentSize(Alignment.Center)
             .clickable {
-              navController.navigate(Screen.Splash.route)
+              navController.navigate(Screen.SplashScreenOfUpieczona.route)
               mainViewModel.onVisibleTitleTopAppBarChanged(false)
             }
         )

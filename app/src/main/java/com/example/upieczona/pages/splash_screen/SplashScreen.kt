@@ -111,7 +111,7 @@ fun SplashScreen(mainViewModel: MainViewModel, navController: NavHostController)
       visible = false
       delay(1500)
       mainViewModel.onVisibleTitleTopAppBarChanged(true)
-      navController.navigate(Screen.MainScreen.route)
+      navController.navigate(Screen.MainScreenOfUpieczona.route)
     }
   }
 }
