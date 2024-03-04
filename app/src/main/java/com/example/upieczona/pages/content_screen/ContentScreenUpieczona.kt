@@ -1,5 +1,6 @@
 package com.example.upieczona.pages.content_screen
 
+import android.security.ConfirmationPrompt
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -9,6 +10,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -24,9 +26,13 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Tab
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +48,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -52,6 +59,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.upieczona.R
+import com.example.upieczona.pages.custom_element.CustomDialogForNote
+import com.example.upieczona.roomdatabase.NoteDao
 import com.example.upieczona.static_object.MaterialsUtils.decodeHtml
 import com.example.upieczona.viewmodel.UpieczonaAPIViewModel
 
@@ -87,7 +96,6 @@ fun ContentScreenUpieczona(
   var selectedTab by remember {
     mutableStateOf(false)
   }
-
   var isExpanded by remember { mutableStateOf(false) }
 
   LaunchedEffect(scaffoldState.bottomSheetState.currentValue) {
@@ -100,10 +108,15 @@ fun ContentScreenUpieczona(
     stringResource(id = R.string.info)
   )
 
+  val (showDialog, setShowDialog) = remember { mutableStateOf(false) }
+  val (noteText, setNoteText) = remember { mutableStateOf("") }
+
+
   BottomSheetScaffold(scaffoldState = scaffoldState,
     sheetTonalElevation = 250.dp,
     sheetPeekHeight = 89.dp,
     sheetDragHandle = {
+
       Column(
         modifier = Modifier
           .fillMaxSize()
@@ -174,7 +187,6 @@ fun ContentScreenUpieczona(
                 modifier = Modifier
                   .fillMaxSize()
                   .padding(start = 13.dp, end = 13.dp),
-                horizontalAlignment = CenterHorizontally,
                 verticalArrangement = Arrangement.Top
               ) {
                 item {
@@ -184,12 +196,25 @@ fun ContentScreenUpieczona(
             }
 
             2 -> {
+              AddNoteButton(onClick = { setShowDialog(true) })
+              postDetails?.id?.let {
+                CustomDialogForNote(
+                  postId = it,
+                  showDialog = showDialog,
+                  onDismiss = { setShowDialog(false) },
+                  onSubmit = { submittedText ->
+                    setNoteText(submittedText)
+                    setShowDialog(false)
+                  },
+                  noteText = noteText,
+                  setNoteText = setNoteText,
+                )
+              }
+
               LazyColumn(
                 modifier = Modifier
                   .fillMaxSize()
-                  .padding(start = 13.dp, end = 13.dp),
-                horizontalAlignment = CenterHorizontally,
-                verticalArrangement = Arrangement.Top
+                  .padding(paddingValues)
               ) {
                 item {
                   Info()
@@ -208,7 +233,7 @@ fun ContentScreenUpieczona(
         modifier = Modifier
           .fillMaxSize()
           .padding(start = 13.dp, end = 13.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = CenterHorizontally,
         verticalArrangement = Arrangement.Top
       ) {
         item {
@@ -221,6 +246,32 @@ fun ContentScreenUpieczona(
       }
     }
   }
+}
+
+@Composable
+fun AddNoteButton(onClick: () -> Unit) {
+  Button(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(top = 10.dp, start = 10.dp, end = 10.dp),
+    onClick = onClick
+  ) {
+    Row {
+      Text(text = "Dodaj nową notatkę", fontSize = 15.sp)
+      Icon(
+        imageVector = Icons.Filled.Create,
+        contentDescription = "added_icon",
+        modifier = Modifier
+          .size(20.dp)
+          .padding(start = 3.dp)
+      )
+    }
+  }
+}
+
+@Composable
+fun ConfirmationPrompt() {
+
 }
 
 @OptIn(ExperimentalFoundationApi::class)
