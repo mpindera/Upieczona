@@ -20,6 +20,4 @@ object MaterialsUtils {
     Regex("<ul class=\"ingredients-list\">(.*?)</ul>", RegexOption.DOT_MATCHES_ALL)
 
   val recipeTitleInstruction = """<div class="entry-content"><p>(.*?)</p></div>""".toRegex()
-
-
 }

@@ -77,7 +77,6 @@ class MainActivity : ComponentActivity() {
                 val postIndex = backStackEntry.arguments?.getInt("postIndex")
                 ContentScreenUpieczona(
                   postIndex = postIndex,
-                  navController = navController,
                   upieczonaAPIViewModel = upieczonaAPIViewModel,
                   paddingValues = paddingValues
                 )

@@ -107,4 +107,29 @@ class UpieczonaAPIViewModel @Inject constructor(
   }
 
 
+
+  private val ingredientCache = mutableMapOf<String, List<String>>()
+  fun formatInstructionsTitle(input: String): List<String> {
+    val regex = """<strong>(.*)<\/strong>""".toRegex()
+    return regex.findAll(input).map { it.groupValues[1] }.toList()
+  }
+
+  fun getCachedIngredients(content: String): List<String> {
+    if (ingredientCache.containsKey(content)) {
+      return ingredientCache[content]!!
+    }
+
+    val ingredients = extractIngredients(content)
+    ingredientCache[content] = ingredients
+    return ingredients
+  }
+
+  fun extractIngredients(content: String): List<String> {
+    val matches = MaterialsUtils.regexPatternTitleIngredientsUpieczona.findAll(content)
+    return matches.map { it.groupValues[1] }.toList()
+  }
+
+  fun ingredientsLists(content: String): List<MatchResult> {
+    return MaterialsUtils.ingredientsListPattern.findAll(content).toList()
+  }
 }

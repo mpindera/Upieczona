@@ -58,8 +58,6 @@ fun MainScreenUpieczona(
   val scrollState by remember { mutableStateOf(LazyGridState(0)) }
   var selectValue by remember { mutableStateOf(0) }
 
-  FetchAllPosts(upieczonaAPIViewModel = upieczonaAPIViewModel)
-
   fun onTabClick(index: Int) {
     selectedIndex = index
   }
@@ -86,7 +84,7 @@ fun MainScreenUpieczona(
     RotatingImage()
   } else {
     if (categoriesState.isEmpty()) {
-      Text(text = stringResource(id = R.string.No_data))
+      Text(text = stringResource(id = R.string.no_data))
     } else {
       ScrollableTabRow(
         selectedTabIndex = selectedIndex,

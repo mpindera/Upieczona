@@ -1,7 +1,13 @@
 package com.example.upieczona.pages.content_screen
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,51 +23,53 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.BottomSheetScaffoldDefaults
-import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Tab
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterVertically
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.upieczona.R
+import com.example.upieczona.dtoposts.PostsOfUpieczonaItemDto
+import com.example.upieczona.static_object.MaterialsUtils
 import com.example.upieczona.static_object.MaterialsUtils.decodeHtml
+import com.example.upieczona.ui.theme.colorCardIngredient
 import com.example.upieczona.viewmodel.UpieczonaAPIViewModel
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ContentScreenUpieczona(
   postIndex: Int?,
-  navController: NavHostController,
   upieczonaAPIViewModel: UpieczonaAPIViewModel,
   paddingValues: PaddingValues
 ) {
@@ -71,13 +79,16 @@ fun ContentScreenUpieczona(
     }
   }
 
-
   val urlsListPhotosUpieczona = remember(postDetails) {
     postDetails?.content?.let { upieczonaAPIViewModel.extractPhotosUrls(it.rendered) }
   }
 
   val decodedTextFromTitleUpieczona = remember(postDetails) {
     postDetails?.title?.rendered?.decodeHtml()
+  }
+
+  val ingredientTitleUpieczona = remember(postDetails) {
+    upieczonaAPIViewModel.getCachedIngredients(postDetails?.content?.rendered.toString())
   }
 
 
@@ -89,56 +100,108 @@ fun ContentScreenUpieczona(
     mutableStateOf(false)
   }
 
-  BottomSheetScaffold(
-    scaffoldState = scaffoldState,
-    sheetPeekHeight = BottomSheetScaffoldDefaults.SheetPeekHeight,
+  var isExpanded by remember { mutableStateOf(false) }
+
+  LaunchedEffect(scaffoldState.bottomSheetState.currentValue) {
+    isExpanded = scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded
+  }
+
+  val tabTitles = listOf(
+    stringResource(id = R.string.ingredients),
+    stringResource(id = R.string.recipe),
+    stringResource(id = R.string.info)
+  )
+
+  BottomSheetScaffold(scaffoldState = scaffoldState,
+    sheetTonalElevation = 250.dp,
+    sheetPeekHeight = 89.dp,
     sheetDragHandle = {
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
+      Column(
+        modifier = Modifier
+          .fillMaxSize()
+          .padding(top = 10.dp)
       ) {
+
+        AnimatedVisibility(
+          visible = !isExpanded, enter = expandVertically(
+            expandFrom = Alignment.Top, clip = true
+          )
+        ) {
+
+          Icon(
+            imageVector = if (isExpanded) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
+            contentDescription = if (isExpanded) "down_Arrow" else "upp_Arrow",
+            modifier = Modifier
+              .fillMaxWidth()
+              .align(CenterHorizontally)
+          )
+        }
+
+        if (decodedTextFromTitleUpieczona != null) {
+          Text(
+            modifier = Modifier
+              .align(CenterHorizontally)
+              .padding(bottom = 10.dp),
+            fontFamily = MaterialTheme.typography.headlineLarge.fontFamily,
+            text = decodedTextFromTitleUpieczona,
+            fontSize = 20.sp,
+            textAlign = TextAlign.Center
+          )
+        }
+
+
         TabRow(
           selectedTabIndex = selectedTabIndex,
-          modifier = Modifier
-            .fillMaxWidth()
-            .align(CenterVertically)
+          modifier = Modifier.fillMaxWidth()
         ) {
-          Tab(
-            text = { Text("Składniki") },
-            selected = selectedTab,
-            onClick = {
-              selectedTabIndex = 0
-              selectedTab = true
+          tabTitles.forEachIndexed { index, title ->
+            Tab(
+              text = { Text(title) },
+              selected = selectedTabIndex == index,
+              onClick = {
+                selectedTabIndex = index
+                selectedTab = true
+              }
+            )
+          }
+        }
+
+        Crossfade(
+          targetState = selectedTabIndex,
+          animationSpec = tween(300, easing = LinearOutSlowInEasing),
+          label = ""
+        ) { tabIndex ->
+          val content = when (tabIndex) {
+            0 -> {
+              LazyColumn(
+                modifier = Modifier
+                  .fillMaxSize()
+                  .padding(start = 13.dp, end = 13.dp),
+                horizontalAlignment = CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+              ) {
+                item {
+                  Ingredients(upieczonaAPIViewModel, postDetails, ingredientTitleUpieczona)
+                }
+              }
             }
-          )
-          Tab(
-            text = { Text("Przepis") },
-            selected = selectedTab,
-            onClick = {
-              selectedTabIndex = 1
-              selectedTab = true
+
+            1 -> {
+              Directions()
             }
-          )
-          Tab(
-            text = { Text("Info") },
-            selected = selectedTab,
-            onClick = {
-              selectedTabIndex = 2
-              selectedTab = true
+
+            2 -> {
+              Info()
             }
-          )
+            else -> {
+              Info()
+            }
+          }
+          content
         }
       }
     },
-    sheetContent = {
-      when (selectedTabIndex) {
-        0 -> {Ingredients()}
-        1 -> {Directions()}
-        2 -> {Info()}
-      }
-    }) {
-
-
+    sheetContent = {}) {
     Column(
       modifier = Modifier.padding(paddingValues)
     ) {
@@ -155,52 +218,11 @@ fun ContentScreenUpieczona(
               urlsListPhotosUpieczona.size, urlsListPhotosUpieczona
             )
           }
-          Row(
-            modifier = Modifier
-              .fillMaxWidth()
-              .align(Alignment.Start)
-          ) {
-            if (decodedTextFromTitleUpieczona != null) {
-              Text(
-                modifier = Modifier.padding(top = 7.dp, bottom = 5.dp),
-                fontFamily = MaterialTheme.typography.headlineLarge.fontFamily,
-                text = decodedTextFromTitleUpieczona,
-                fontSize = 20.sp,
-                textAlign = TextAlign.Center
-              )
-            }
-          }
         }
       }
     }
   }
 }
-
-@Composable
-fun Ingredients() {
-  LazyColumn(content = {
-    items(10) {
-      Text(text = "")
-    }
-  })
-}
-@Composable
-fun Directions() {
-  LazyColumn(content = {
-    items(10) {
-      Text(text = "")
-    }
-  })
-}
-@Composable
-fun Info() {
-  LazyColumn(content = {
-    items(10) {
-      Text(text = "")
-    }
-  })
-}
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

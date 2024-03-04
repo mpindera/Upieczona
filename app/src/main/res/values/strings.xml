@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Upieczona</string>
-    <string name="No_data">Brak odpowiedzi</string>
+    <string name="no_data">No response</string>
+    <string name="ingredients">Ingredients</string>
+    <string name="recipe">Recipe</string>
+    <string name="info">Info</string>
+
 </resources>
