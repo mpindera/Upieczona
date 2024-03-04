@@ -15,6 +15,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.jsoup.Jsoup
 import javax.inject.Inject
 
 @HiltViewModel
@@ -131,5 +132,30 @@ class UpieczonaAPIViewModel @Inject constructor(
 
   fun ingredientsLists(content: String): List<MatchResult> {
     return MaterialsUtils.ingredientsListPattern.findAll(content).toList()
+  }
+  fun formatInstructionsAdditionalInfo(input: String): List<String> {
+    val document = Jsoup.parse(input)
+    return document.select("p:has(em)").map {
+      it.toString().replace("<p>", "").replace("<em>", "").replace("</p>", "")
+        .replace("</em>", "\n")
+    }.toList()
+  }
+  fun fetchRecipe(input: String): List<String> {
+    val pattern = "<p>.*?</p>".toRegex()
+    val matches = pattern.findAll(input).map { it.value }.toList()
+
+    val document = Jsoup.parse(matches.toString())
+
+    val paragraphs = document.select("p:not(:has(em))").map { paragraph ->
+      var paragraphHtml = paragraph.html()
+      paragraphHtml = paragraphHtml.replaceFirst("<br>", "   ")
+      paragraphHtml = paragraphHtml.replace(Regex("<strong>.*?</strong>"), "")
+      paragraphHtml = paragraphHtml.replace("<p>", "\n")
+      paragraphHtml = paragraphHtml.replace("</p>", "\n")
+
+      paragraphHtml
+    }
+
+    return paragraphs
   }
 }

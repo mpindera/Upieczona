@@ -100,5 +100,13 @@ dependencies {
   kapt("androidx.hilt:hilt-compiler:1.2.0")
   implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
+  /** ROOM **/
+  implementation("androidx.room:room-runtime:2.6.1")
+  implementation ("androidx.room:room-ktx:2.6.1")
+  implementation ("androidx.compose.runtime:runtime-livedata:1.6.2")
+  annotationProcessor ("androidx.room:room-compiler:2.6.1")
+  kapt ("androidx.room:room-compiler:2.6.1")
+
 
 }
+

@@ -7,7 +7,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,10 +27,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.BottomSheetScaffold
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -52,26 +47,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.upieczona.R
-import com.example.upieczona.dtoposts.PostsOfUpieczonaItemDto
-import com.example.upieczona.static_object.MaterialsUtils
 import com.example.upieczona.static_object.MaterialsUtils.decodeHtml
-import com.example.upieczona.ui.theme.colorCardIngredient
 import com.example.upieczona.viewmodel.UpieczonaAPIViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ContentScreenUpieczona(
-  postIndex: Int?,
-  upieczonaAPIViewModel: UpieczonaAPIViewModel,
-  paddingValues: PaddingValues
+  postIndex: Int?, upieczonaAPIViewModel: UpieczonaAPIViewModel, paddingValues: PaddingValues
 ) {
   val postDetails = remember(upieczonaAPIViewModel.allPosts) {
     postIndex?.let { index ->
@@ -86,9 +73,10 @@ fun ContentScreenUpieczona(
   val decodedTextFromTitleUpieczona = remember(postDetails) {
     postDetails?.title?.rendered?.decodeHtml()
   }
+  val stringPostDetails = postDetails?.content?.rendered.toString()
 
   val ingredientTitleUpieczona = remember(postDetails) {
-    upieczonaAPIViewModel.getCachedIngredients(postDetails?.content?.rendered.toString())
+    upieczonaAPIViewModel.getCachedIngredients(stringPostDetails)
   }
 
 
@@ -151,18 +139,13 @@ fun ContentScreenUpieczona(
 
 
         TabRow(
-          selectedTabIndex = selectedTabIndex,
-          modifier = Modifier.fillMaxWidth()
+          selectedTabIndex = selectedTabIndex, modifier = Modifier.fillMaxWidth()
         ) {
           tabTitles.forEachIndexed { index, title ->
-            Tab(
-              text = { Text(title) },
-              selected = selectedTabIndex == index,
-              onClick = {
-                selectedTabIndex = index
-                selectedTab = true
-              }
-            )
+            Tab(text = { Text(title) }, selected = selectedTabIndex == index, onClick = {
+              selectedTabIndex = index
+              selectedTab = true
+            })
           }
         }
 
@@ -171,7 +154,7 @@ fun ContentScreenUpieczona(
           animationSpec = tween(300, easing = LinearOutSlowInEasing),
           label = ""
         ) { tabIndex ->
-          val content = when (tabIndex) {
+          when (tabIndex) {
             0 -> {
               LazyColumn(
                 modifier = Modifier
@@ -181,23 +164,39 @@ fun ContentScreenUpieczona(
                 verticalArrangement = Arrangement.Top
               ) {
                 item {
-                  Ingredients(upieczonaAPIViewModel, postDetails, ingredientTitleUpieczona)
+                  Ingredients(upieczonaAPIViewModel, stringPostDetails, ingredientTitleUpieczona)
                 }
               }
             }
 
             1 -> {
-              Directions()
+              LazyColumn(
+                modifier = Modifier
+                  .fillMaxSize()
+                  .padding(start = 13.dp, end = 13.dp),
+                horizontalAlignment = CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+              ) {
+                item {
+                  Recipe(upieczonaAPIViewModel, stringPostDetails)
+                }
+              }
             }
 
             2 -> {
-              Info()
-            }
-            else -> {
-              Info()
+              LazyColumn(
+                modifier = Modifier
+                  .fillMaxSize()
+                  .padding(start = 13.dp, end = 13.dp),
+                horizontalAlignment = CenterHorizontally,
+                verticalArrangement = Arrangement.Top
+              ) {
+                item {
+                  Info()
+                }
+              }
             }
           }
-          content
         }
       }
     },

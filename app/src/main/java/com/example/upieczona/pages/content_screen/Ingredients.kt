@@ -9,18 +9,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -28,7 +24,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.upieczona.dtoposts.PostsOfUpieczonaItemDto
 import com.example.upieczona.static_object.MaterialsUtils
 import com.example.upieczona.viewmodel.UpieczonaAPIViewModel
 
@@ -36,12 +31,12 @@ import com.example.upieczona.viewmodel.UpieczonaAPIViewModel
 @Composable
 fun Ingredients(
   upieczonaAPIViewModel: UpieczonaAPIViewModel,
-  postDetails: PostsOfUpieczonaItemDto?,
+  stringPostDetails: String,
   ingredientTitleUpieczona: List<String>,
 ) {
   for (i in ingredientTitleUpieczona.indices) {
     val firstIngredients = Regex(MaterialsUtils.regexPatternShopListUpieczona).findAll(
-      upieczonaAPIViewModel.ingredientsLists(postDetails?.content?.rendered.toString())[i].groupValues[1]
+      upieczonaAPIViewModel.ingredientsLists(stringPostDetails)[i].groupValues[1]
     ).map { it.groupValues[1] }.toList()
     val ingredientStates = remember {
       firstIngredients.map { title ->
@@ -57,7 +52,7 @@ fun Ingredients(
       fontSize = 18.sp,
       fontWeight = FontWeight.Bold,
     )
-    if (upieczonaAPIViewModel.ingredientsLists(postDetails?.content?.rendered.toString())
+    if (upieczonaAPIViewModel.ingredientsLists(stringPostDetails)
         .isNotEmpty()
     ) {
 
@@ -88,7 +83,7 @@ fun Ingredients(
 
 @Composable
 @Preview(showBackground = true)
-fun test() {
+fun testIngredients() {
   Column(
     modifier = Modifier
       .fillMaxSize()
@@ -98,7 +93,7 @@ fun test() {
     Text(
       modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
       fontFamily = MaterialTheme.typography.headlineSmall.fontFamily,
-      text = "ingredientTitle()",
+      text = "ingredientTitle",
       textAlign = TextAlign.Start,
       fontSize = 18.sp,
       fontWeight = FontWeight.Bold,

@@ -6,9 +6,5 @@ import androidx.compose.runtime.Composable
 
 @Composable
 fun Info() {
-  LazyColumn(content = {
-    items(10) {
-      Text(text = "")
-    }
-  })
+
 }
