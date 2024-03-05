@@ -9,6 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.upieczona.data.remote.repository.NoteRepositoryImpl
 import com.example.upieczona.roomdatabase.Note
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,27 +20,24 @@ class NoteViewModel @Inject constructor(
   private val noteRepository: NoteRepositoryImpl
 ) : ViewModel() {
 
-  private val _notes = mutableStateOf<List<Note>>(emptyList())
-  val notes: State<List<Note>> = _notes
-
   private var _onLoading by mutableStateOf(false)
   val onLoading: Boolean
     get() = _onLoading
 
+  private val _notes = MutableStateFlow(emptyList<Note>())
+  val notes = _notes.asStateFlow()
 
-  private fun loadTask(postId: Int) {
-    viewModelScope.launch() {
-      _notes.value = noteRepository.getAllNote(postId = postId)
+  fun loadNotesById(postId: Int) {
+    viewModelScope.launch(IO) {
+      _notes.value = noteRepository.getNotesByPostId(postId = postId)
     }
   }
-  
-  suspend fun insertTask(note: Note, postId: Int) {
+
+  fun insertNote(note: Note) {
     viewModelScope.launch {
       _onLoading = true
-      noteRepository.insertTask(note)
-      _notes.value = noteRepository.getAllNote(postId = postId)
+      noteRepository.insert(note = note)
       _onLoading = false
     }
   }
-
 }

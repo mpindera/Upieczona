@@ -1,6 +1,5 @@
 package com.example.upieczona.pages.content_screen
 
-import android.security.ConfirmationPrompt
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -26,8 +25,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Tab
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -48,7 +45,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -57,17 +53,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.upieczona.R
 import com.example.upieczona.pages.custom_element.CustomDialogForNote
-import com.example.upieczona.roomdatabase.NoteDao
+import com.example.upieczona.roomdatabase.Note
 import com.example.upieczona.static_object.MaterialsUtils.decodeHtml
+import com.example.upieczona.viewmodel.NoteViewModel
 import com.example.upieczona.viewmodel.UpieczonaAPIViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ContentScreenUpieczona(
-  postIndex: Int?, upieczonaAPIViewModel: UpieczonaAPIViewModel, paddingValues: PaddingValues
+  postIndex: Int?,
+  upieczonaAPIViewModel: UpieczonaAPIViewModel,
+  paddingValues: PaddingValues,
+  viewModel: NoteViewModel = hiltViewModel()
 ) {
   val postDetails = remember(upieczonaAPIViewModel.allPosts) {
     postIndex?.let { index ->
@@ -202,24 +203,11 @@ fun ContentScreenUpieczona(
                   postId = it,
                   showDialog = showDialog,
                   onDismiss = { setShowDialog(false) },
-                  onSubmit = { submittedText ->
-                    setNoteText(submittedText)
-                    setShowDialog(false)
-                  },
                   noteText = noteText,
                   setNoteText = setNoteText,
                 )
               }
-
-              LazyColumn(
-                modifier = Modifier
-                  .fillMaxSize()
-                  .padding(paddingValues)
-              ) {
-                item {
-                  Info()
-                }
-              }
+              Info(postDetails, paddingValues)
             }
           }
         }
@@ -267,11 +255,6 @@ fun AddNoteButton(onClick: () -> Unit) {
       )
     }
   }
-}
-
-@Composable
-fun ConfirmationPrompt() {
-
 }
 
 @OptIn(ExperimentalFoundationApi::class)

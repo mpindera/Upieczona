@@ -3,6 +3,7 @@ plugins {
   id("org.jetbrains.kotlin.android")
   id("kotlin-kapt")
   id("com.google.dagger.hilt.android")
+  kotlin("plugin.serialization") version "1.7.0"
 }
 
 android {
@@ -104,7 +105,12 @@ dependencies {
   implementation("androidx.room:room-runtime:2.6.1")
   implementation ("androidx.room:room-ktx:2.6.1")
   implementation ("androidx.compose.runtime:runtime-livedata:1.6.2")
-  annotationProcessor ("androidx.room:room-compiler:2.6.1")
+  implementation("androidx.room:room-paging:2.6.1")
+  kapt("androidx.room:room-compiler:2.6.1")
+
+  /** LifeCycle **/
+  implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+  implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.7.0")
 
 
 }

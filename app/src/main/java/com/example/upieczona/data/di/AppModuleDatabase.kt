@@ -1,10 +1,12 @@
 package com.example.upieczona.data.di
 
+import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import com.example.upieczona.data.remote.repository.NoteRepositoryImpl
 import com.example.upieczona.roomdatabase.NoteDao
 import com.example.upieczona.roomdatabase.NoteDatabase
+import com.example.upieczona.roomdatabase.NoteRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,16 +17,25 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModuleDatabase {
-
   @Provides
   @Singleton
-  fun provideAppDatabase(@ApplicationContext appContext: Context): NoteDatabase {
-    return NoteDatabase.getDatabase(appContext)
+  fun provideMyDataBase(app: Application): NoteDatabase {
+    return Room.databaseBuilder(
+      app,
+      NoteDatabase::class.java,
+      "MyDataBase"
+    ).build()
   }
 
   @Provides
   @Singleton
-  fun provideNoteDao(database: NoteDatabase): NoteDao {
-    return database.noteDao()
+  fun provideNoteDao(myDatabase: NoteDatabase): NoteDao {
+    return myDatabase.noteDao
+  }
+
+  @Provides
+  @Singleton
+  fun provideMyRepository(noteDao: NoteDao): NoteRepository {
+    return NoteRepositoryImpl(noteDao)
   }
 }
