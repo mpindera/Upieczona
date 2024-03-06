@@ -23,9 +23,11 @@ fun CustomDialogForNote(
   setNoteText: (String) -> Unit,
   viewModel: NoteViewModel = hiltViewModel()
 ) {
+
   val onSubmit: (value: Note) -> Unit = remember {
-    return@remember viewModel::insertNote
+    return@remember viewModel::insertNoteToDatabase
   }
+
   if (showDialog) {
     AlertDialog(onDismissRequest = onDismiss,
       title = { Text("Dodaj nową notatkę", fontSize = 15.sp) },

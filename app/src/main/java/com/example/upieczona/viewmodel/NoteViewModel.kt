@@ -33,10 +33,27 @@ class NoteViewModel @Inject constructor(
     }
   }
 
-  fun insertNote(note: Note) {
+  fun insertNoteToDatabase(note: Note) {
     viewModelScope.launch {
       _onLoading = true
-      noteRepository.insert(note = note)
+      noteRepository.insertNote(note = note)
+      _onLoading = false
+    }
+  }
+
+  fun deleteNote(id: Int, postId: Int) {
+    viewModelScope.launch {
+      _onLoading = true
+      noteRepository.deleteNoteFromDatabase(id = id)
+      _onLoading = false
+      _notes.value = noteRepository.getNotesByPostId(postId = postId)
+    }
+  }
+
+  fun updateNote(note: Note) {
+    viewModelScope.launch {
+      _onLoading = true
+      noteRepository.updateNoteFromDatabase(note = note)
       _onLoading = false
     }
   }
