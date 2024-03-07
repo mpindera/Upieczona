@@ -1,5 +1,29 @@
 ## Upieczona
 
+Welcome to the mobile app "Upieczona"!
+
+---
+
+## App description:
+
+"Upieczona" is a simple and intuitive mobile application available for the Android platform, 
+which provides users with easy and convenient access to the blog, allowing them to keep track of the latest posts in one place.
+The app also allows users to add their own notes to recipes.
+
+## Features:
+
+1. **Browsing recipes:** Users can browse existing recipes downloaded from the Blog's external API.
+2. **Add notes:** The app allows users to add new notes that will be stored locally on the device.
+3. **Edit notes:** Users can edit existing notes.
+4. **Deleting notes:** The application allows users to delete notes from the list.
+
+
+---
+---
+
+
+## Upieczona
+
 Witaj w aplikacji mobilnej "Upieczona"!
 
 ---
@@ -17,4 +41,5 @@ Aplikacja pozwala również na dodawanie własnych notatek do przepisów.
 3. **Edycja notatek:** Użytkownicy mają możliwość edycji istniejących notatek.
 4. **Usuwanie notatek:** Aplikacja umożliwia usuwanie notatek z listy.
 
-![Uploading Upieczona.png…]()
+
+![Upieczona](https://github.com/mpindera/Upieczona/assets/107795584/fe996911-7660-4fa3-bc7a-12df7d6f0cda)
