@@ -34,7 +34,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
   private val mainViewModel by viewModels<MainViewModel>()
 
-  @OptIn(ExperimentalMaterial3Api::class)
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
@@ -86,14 +85,5 @@ class MainActivity : ComponentActivity() {
         }
       }
     }
-  }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-  UpieczonaTheme {
-
   }
 }

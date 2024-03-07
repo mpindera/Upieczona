@@ -1,6 +1,5 @@
 package com.example.upieczona.data.domain.repository
 
-import androidx.room.Update
 import com.example.upieczona.roomdatabase.Note
 
 interface NoteRepository {

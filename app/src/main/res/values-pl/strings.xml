@@ -5,4 +5,11 @@
     <string name="ingredients">Składniki</string>
     <string name="recipe">Przepis</string>
     <string name="info">info</string>
+    <string name="add_note">Dodaj nową notatkę</string>
+    <string name="enter_note">Wprowadź swoją notatkę</string>
+    <string name="add">Dodaj</string>
+    <string name="cancel">Anuluj</string>
+    <string name="edit_note">Edytuj notatkę</string>
+    <string name="save_note">Zapisz</string>
+
 </resources>

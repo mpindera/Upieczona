@@ -8,8 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.upieczona.R
 import com.example.upieczona.roomdatabase.Note
 import com.example.upieczona.roomdatabase.NoteDao
 import com.example.upieczona.viewmodel.NoteViewModel
@@ -21,6 +23,7 @@ fun CustomDialogForNote(
   onDismiss: () -> Unit,
   noteText: String,
   setNoteText: (String) -> Unit,
+  resetNoteText: () -> Unit,
   viewModel: NoteViewModel = hiltViewModel()
 ) {
 
@@ -29,30 +32,30 @@ fun CustomDialogForNote(
   }
 
   if (showDialog) {
-    AlertDialog(onDismissRequest = onDismiss,
-      title = { Text("Dodaj nową notatkę", fontSize = 15.sp) },
-      text = {
-        OutlinedTextField(value = noteText,
-          onValueChange = setNoteText,
-          placeholder = { Text("Wprowadź swoją notatkę") })
-      },
-      confirmButton = {
-        Button(onClick = {
-          onSubmit(
-            Note(title = noteText, postId = postId)
-          )
-          Log.d("test","dodane")
-          onDismiss()
-        }) {
-          Text("Dodaj")
-        }
-      },
-      dismissButton = {
-        Button(
-          onClick = onDismiss
-        ) {
-          Text("Anuluj")
-        }
-      })
+    AlertDialog(onDismissRequest = {
+      resetNoteText()
+      onDismiss()
+    }, title = { Text(stringResource(id = R.string.add_note), fontSize = 15.sp) }, text = {
+      OutlinedTextField(value = noteText,
+        onValueChange = setNoteText,
+        placeholder = { Text(stringResource(id = R.string.enter_note)) })
+    }, confirmButton = {
+      Button(onClick = {
+        onSubmit(
+          Note(title = noteText, postId = postId)
+        )
+        resetNoteText()
+        onDismiss()
+      }) {
+        Text(stringResource(id = R.string.add))
+      }
+    }, dismissButton = {
+      Button(onClick = {
+        resetNoteText()
+        onDismiss()
+      }) {
+        Text(stringResource(id = R.string.cancel))
+      }
+    })
   }
 }

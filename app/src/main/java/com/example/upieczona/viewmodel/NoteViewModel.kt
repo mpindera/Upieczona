@@ -1,6 +1,5 @@
 package com.example.upieczona.viewmodel
 
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -50,11 +49,12 @@ class NoteViewModel @Inject constructor(
     }
   }
 
-  fun updateNote(note: Note) {
+  fun updateNote(note: Note,postId: Int) {
     viewModelScope.launch {
       _onLoading = true
       noteRepository.updateNoteFromDatabase(note = note)
       _onLoading = false
+      _notes.value = noteRepository.getNotesByPostId(postId = postId)
     }
   }
 }

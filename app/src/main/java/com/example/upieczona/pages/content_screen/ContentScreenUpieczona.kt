@@ -199,13 +199,12 @@ fun ContentScreenUpieczona(
             2 -> {
               AddNoteButton(onClick = { setShowDialog(true) })
               postDetails?.id?.let {
-                CustomDialogForNote(
-                  postId = it,
+                CustomDialogForNote(postId = it,
                   showDialog = showDialog,
                   onDismiss = { setShowDialog(false) },
                   noteText = noteText,
                   setNoteText = setNoteText,
-                )
+                  resetNoteText = { setNoteText("") })
               }
               Info(postDetails, paddingValues)
             }
@@ -245,7 +244,7 @@ fun AddNoteButton(onClick: () -> Unit) {
     onClick = onClick
   ) {
     Row {
-      Text(text = "Dodaj nową notatkę", fontSize = 15.sp)
+      Text(text = stringResource(id = R.string.add_note), fontSize = 15.sp)
       Icon(
         imageVector = Icons.Filled.Create,
         contentDescription = "added_icon",
