@@ -1,3 +1,5 @@
+![Upieczona](https://github.com/mpindera/Upieczona/assets/107795584/fe996911-7660-4fa3-bc7a-12df7d6f0cda)
+
 ## Upieczona
 
 Welcome to the mobile app "Upieczona"!
@@ -42,4 +44,3 @@ Aplikacja pozwala również na dodawanie własnych notatek do przepisów.
 4. **Usuwanie notatek:** Aplikacja umożliwia usuwanie notatek z listy.
 
 
-![Upieczona](https://github.com/mpindera/Upieczona/assets/107795584/fe996911-7660-4fa3-bc7a-12df7d6f0cda)
