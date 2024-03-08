@@ -12,7 +12,3 @@ val Pink40 = Color(0xFF7D5260)
 
 val colorPinkMain = Color(0xFFd6bbb4)
 val colorPink = Color(0xFFeee3df)
-val PinkUpieczona = Color(0xFFd6bbb4)
-val colorRed = Color(0xBEE02C2C)
-val colorCardIngredient = Color(0xFFfaf0ee)
-val colorSurface = Color.hsl(300.0F, 0.1F, 0.60F)

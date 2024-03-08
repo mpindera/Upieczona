@@ -108,10 +108,9 @@ class UpieczonaAPIViewModel @Inject constructor(
   }
 
 
-
   private val ingredientCache = mutableMapOf<String, List<String>>()
   fun formatInstructionsTitle(input: String): List<String> {
-    val regex = """<strong>(.*)<\/strong>""".toRegex()
+    val regex = Regex("<strong>(.*?)</strong>")
     return regex.findAll(input).map { it.groupValues[1] }.toList()
   }
 
@@ -133,13 +132,15 @@ class UpieczonaAPIViewModel @Inject constructor(
   fun ingredientsLists(content: String): List<MatchResult> {
     return MaterialsUtils.ingredientsListPattern.findAll(content).toList()
   }
+
   fun formatInstructionsAdditionalInfo(input: String): List<String> {
     val document = Jsoup.parse(input)
     return document.select("p:has(em)").map {
-      it.toString().replace("<p>", "").replace("<em>", "").replace("</p>", "")
+      it.toString().replace("<p>", "").replace("<em>", "").replace("</p>", "").replace("<br>", " ")
         .replace("</em>", "\n")
     }.toList()
   }
+
   fun fetchRecipe(input: String): List<String> {
     val pattern = "<p>.*?</p>".toRegex()
     val matches = pattern.findAll(input).map { it.value }.toList()
@@ -147,9 +148,12 @@ class UpieczonaAPIViewModel @Inject constructor(
     val document = Jsoup.parse(matches.toString())
 
     val paragraphs = document.select("p:not(:has(em))").map { paragraph ->
+      val htmlLink = extractUrlFromHtml(paragraph.toString())
       var paragraphHtml = paragraph.html()
+
       paragraphHtml = paragraphHtml.replaceFirst("<br>", "   ")
-      paragraphHtml = paragraphHtml.replace(Regex("<strong>.*?</strong>"), "")
+      paragraphHtml = paragraphHtml.replace(Regex("<strong>(?!.*?TEGO).*?</strong>"), "")
+      paragraphHtml = paragraphHtml.replace("TEGO", htmlLink)
       paragraphHtml = paragraphHtml.replace("<p>", "\n")
       paragraphHtml = paragraphHtml.replace("</p>", "\n")
 
@@ -157,5 +161,11 @@ class UpieczonaAPIViewModel @Inject constructor(
     }
 
     return paragraphs
+  }
+
+  fun extractUrlFromHtml(htmlString: String): String {
+    val regex = """href="([^"]+)"""".toRegex()
+    val matchResult = regex.find(htmlString)
+    return matchResult?.groupValues?.get(1).toString()
   }
 }
